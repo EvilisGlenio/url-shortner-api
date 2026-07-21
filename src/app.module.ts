@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { createDatabaseOptions } from './database/data-source';
 
 @Module({
   imports: [
@@ -14,10 +15,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
 
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        url: configService.getOrThrow<string>('DATABASE_URL'),
+        ...createDatabaseOptions(
+          configService.getOrThrow<string>('DATABASE_URL'),
+          configService.get<string>('NODE_ENV'),
+        ),
         autoLoadEntities: true,
-        synchronize: true,
       }),
     }),
   ],
