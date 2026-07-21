@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const createDatabaseOptions = (
@@ -8,7 +9,7 @@ export const createDatabaseOptions = (
   url: databaseUrl,
 
   entities: [__dirname + '/../**/*.entity.{js,ts}'],
-  migrations: [__dirname + '/../migrations/*.{js,ts}'],
+  migrations: [__dirname + '/migrations/*{.js,.ts}'],
 
   synchronize: false,
 
