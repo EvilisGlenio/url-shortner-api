@@ -211,6 +211,38 @@ The initial implementation is expected to use:
 
 Redis and a message queue may be introduced later if performance or reliability requirements justify them.
 
+## Migrations
+
+Create an empty migration:
+
+```bash
+npm run migration:create -- src/database/migrations/<migration-name>
+```
+
+Generate a migration from entity changes:
+
+```bash
+npm run migration:generate -- src/database/migrations/<migration-name>
+```
+
+Run all pending migrations:
+
+```bash
+npm run migration:run
+```
+
+Show the status of all migrations:
+
+```bash
+npm run migration:show
+```
+
+Revert the most recently applied migration:
+
+```bash
+npm run migration:revert
+```
+
 ## Possible Initial API
 
 ```http
