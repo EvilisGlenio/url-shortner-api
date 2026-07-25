@@ -216,31 +216,31 @@ Redis and a message queue may be introduced later if performance or reliability 
 Create an empty migration:
 
 ```bash
-npm run migration:create -- src/database/migrations/<migration-name>
+pnpm run migration:create src/database/migrations/<migration-name>
 ```
 
 Generate a migration from entity changes:
 
 ```bash
-npm run migration:generate -- src/database/migrations/<migration-name>
+pnpm run migration:generate src/database/migrations/<migration-name>
 ```
 
 Run all pending migrations:
 
 ```bash
-npm run migration:run
+pnpm run migration:run
 ```
 
 Show the status of all migrations:
 
 ```bash
-npm run migration:show
+pnpm run migration:show
 ```
 
 Revert the most recently applied migration:
 
 ```bash
-npm run migration:revert
+pnpm run migration:revert
 ```
 
 ## Possible Initial API
