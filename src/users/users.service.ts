@@ -1,26 +1,59 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { EmailAlreadyExistsError } from './errors/email-already-exists.error';
+import { User } from './entities/user.entity';
+import { CreateUserInput } from './types/create-user.input';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return `This action adds a new user with name: ${createUserDto.name}, email: ${createUserDto.email}, and password hash: ${createUserDto.passwordHash}`;
+  constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
+  ) {}
+
+  findByEmail(
+    email: string,
+    options: { withDeleted?: boolean } = {},
+  ): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { email: email.trim().toLowerCase() },
+      withDeleted: options.withDeleted ?? false,
+    });
   }
 
-  findAll() {
-    return `This action returns all users`;
+  findById(id: string): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  async create(input: CreateUserInput): Promise<User> {
+    const user = this.usersRepository.create({
+      ...input,
+      email: input.email.trim().toLowerCase(),
+    });
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user with the following data: ${JSON.stringify(updateUserDto)}`;
+    try {
+      return await this.usersRepository.save(user);
+    } catch (error: unknown) {
+      if (
+        isPostgresError(error) &&
+        error.code === '23505' &&
+        error.constraint === 'IDX_users_email_lower_unique'
+      ) {
+        throw new EmailAlreadyExistsError();
+      }
+      throw error;
+    }
   }
+}
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+function isPostgresError(
+  error: unknown,
+): error is { code: string; constraint?: string } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof error.code === 'string'
+  );
 }
